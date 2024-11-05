@@ -1,15 +1,19 @@
-# plugin_workshop
+# Building robust plugins with Pigeon 🐦
 
-A new Flutter project.
+This repository is a demonstration of how to use Pigeon for FFI in Flutter Plugins. It is a simple
+flutter plugin that uses pigeon to perform some basic operations on with the native platforms.
 
-## Getting Started
+## Getting Started 🚀
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+This projects runs on the latest version of Flutter. To run this project, you need to have the
+latest version of Flutter installed on your machine. You can get the latest version of Flutter from
+the official Flutter website.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Pigeon 🐦
+
+Pigeon is a code generator that simplifies the communication between Flutter and the host platform.
+To learn more about Pigeon, check out the official
+documentation [here](https://pub.dev/packages/pigeon). You can checkout the example usage provided
+by the flutter
+team [here](https://github.com/flutter/packages/blob/main/packages/pigeon/example/README.md)
 
