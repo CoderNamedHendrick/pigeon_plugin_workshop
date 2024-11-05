@@ -1,42 +1,32 @@
 import Flutter
 import UIKit
 
-public class PluginWorkshopPlugin: NSObject, FlutterPlugin {
+public class PluginWorkshopPlugin: NSObject, FlutterPlugin, ArithmeticHostApi {
+
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "plugin_workshop", binaryMessenger: registrar.messenger())
-        let instance = PluginWorkshopPlugin()
-        registrar.addMethodCallDelegate(instance, channel: channel)
+        let messenger = registrar.messenger()
+        let api = PluginWorkshopPlugin.init()
+        ArithmeticHostApiSetup.setUp(binaryMessenger: messenger, api: api)
     }
     
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        switch call.method {
-        case "add":
-            let args = call.arguments as! Dictionary<String, Any>
-            let a = args["input1"] as! Double
-            let b = args["input2"] as! Double
-            result(a+b)
-        case "subtract":
-            let args = call.arguments as! Dictionary<String, Any>
-            let a = args["input1"] as! Double
-            let b = args["input2"] as! Double
-            result(a-b)
-        case "multiply":
-            let args = call.arguments as! Dictionary<String, Any>
-            let a = args["input1"] as! Double
-            let b = args["input2"] as! Double
-            result(a*b)
-        case "divide":
-            let args = call.arguments as! Dictionary<String, Any>
-            let a = args["input1"] as! Double
-            let b = args["input2"] as! Double
-            
-            if (b == 0) {
-                result(FlutterError(code: "DIVISION_BY_ZERO", message: "Cannot divide by zero", details: nil))
-                return
+    public func detachFromEngine(for registrar: any FlutterPluginRegistrar) {
+        ArithmeticHostApiSetup.setUp(binaryMessenger: registrar.messenger(), api: nil)
+    }
+    
+    func performArithmeticOperation(input1: Double, input2: Double, operation: ArithmeticOperation) throws -> Double {
+        switch(operation) {
+        case .add:
+            return input1 + input2
+        case .subtract:
+            return input1 - input2
+        case .multiply:
+            return input1 * input2
+        case .divide:
+            if (input2 == 0.0) {
+                throw PluginPigeonError(code: "DIVISION_BY_ZERO", message: "Cannot divide by zero", details: nil)
             }
-            result(a/b)
-        default:
-            result(FlutterMethodNotImplemented)
+            
+            return input1 / input2
         }
     }
 }

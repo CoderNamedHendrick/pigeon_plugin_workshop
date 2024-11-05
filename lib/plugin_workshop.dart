@@ -1,19 +1,22 @@
-import 'plugin_workshop_platform_interface.dart';
+import 'package:flutter/services.dart';
+import 'package:plugin_workshop/pigeons/plugin_pigeon.dart';
+
+import 'arithmetic_errors.dart';
+
+export 'pigeons/plugin_pigeon.dart' show ArithmeticOperation;
 
 class PluginWorkshop {
-  Future<double> add(double firstNumber, double secondNumber) {
-    return PluginWorkshopPlatform.instance.add(firstNumber, secondNumber);
-  }
+  final _hostApi = ArithmeticHostApi();
 
-  Future<double> subtract(double firstNumber, double secondNumber) {
-    return PluginWorkshopPlatform.instance.subtract(firstNumber, secondNumber);
-  }
-
-  Future<double> multiply(double firstNumber, double secondNumber) {
-    return PluginWorkshopPlatform.instance.multiply(firstNumber, secondNumber);
-  }
-
-  Future<double> divide(double firstNumber, double secondNumber) {
-    return PluginWorkshopPlatform.instance.divide(firstNumber, secondNumber);
+  Future<double> performArithmeticOperation(
+      double input1, double input2, ArithmeticOperation operation) async {
+    try {
+      return await _hostApi.performArithmeticOperation(
+          input1, input2, operation);
+    } on PlatformException catch (e) {
+      throw PluginPigeonException.fromPlatformException(e);
+    } on Exception catch (e) {
+      throw DefaultPluginPigeonException(message: e.toString());
+    }
   }
 }

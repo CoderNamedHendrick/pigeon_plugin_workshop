@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
+import 'package:plugin_workshop/arithmetic_errors.dart';
 import 'package:plugin_workshop/plugin_workshop.dart';
-
-enum ArithmeticOperation { add, subtract, multiply, divide }
 
 void main() {
   runApp(const MyApp());
@@ -163,21 +162,24 @@ class _MyAppState extends State<MyApp> {
 
     try {
       _toggleLoading();
-      result = await switch (_operation) {
-        ArithmeticOperation.add => _pluginWorkshopPlugin.add(input1, input2),
-        ArithmeticOperation.subtract =>
-          _pluginWorkshopPlugin.subtract(input1, input2),
-        ArithmeticOperation.multiply =>
-          _pluginWorkshopPlugin.multiply(input1, input2),
-        ArithmeticOperation.divide =>
-          _pluginWorkshopPlugin.divide(input1, input2),
-        _ => throw UnimplementedError('Method not implemented'),
-      };
+      result = await _pluginWorkshopPlugin.performArithmeticOperation(
+        input1,
+        input2,
+        _operation!,
+      );
 
       setState(() {
         _operation = null;
       });
-    } on PlatformException catch (e) {
+    } on DivisionByZeroException catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Division by zero error: ${e.message}'),
+        ),
+      );
+    } on PluginPigeonException catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

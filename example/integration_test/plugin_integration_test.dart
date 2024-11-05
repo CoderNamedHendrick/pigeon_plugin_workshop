@@ -16,25 +16,29 @@ void main() {
 
   testWidgets('add test', (tester) async {
     final PluginWorkshop plugin = PluginWorkshop();
-    final double result = await plugin.add(5, 10);
+    final double result =
+        await plugin.performArithmeticOperation(5, 10, ArithmeticOperation.add);
     expect(result, 15);
   });
 
   testWidgets('subtract test', (tester) async {
     final PluginWorkshop plugin = PluginWorkshop();
-    final double result = await plugin.subtract(10, 5);
+    final double result = await plugin.performArithmeticOperation(
+        10, 5, ArithmeticOperation.subtract);
     expect(result, 5);
   });
 
   testWidgets('multiply test', (tester) async {
     final PluginWorkshop plugin = PluginWorkshop();
-    final double result = await plugin.multiply(5, 10);
+    final double result = await plugin.performArithmeticOperation(
+        5, 10, ArithmeticOperation.multiply);
     expect(result, 50);
   });
 
   testWidgets('divide test', (tester) async {
     final PluginWorkshop plugin = PluginWorkshop();
-    final double result = await plugin.divide(10, 5);
+    final double result = await plugin.performArithmeticOperation(
+        10, 5, ArithmeticOperation.divide);
     expect(result, 2);
   });
 }
