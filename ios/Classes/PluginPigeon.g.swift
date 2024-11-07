@@ -55,6 +55,10 @@ private func wrapError(_ error: Any) -> [Any?] {
   ]
 }
 
+private func createConnectionError(withChannelName channelName: String) -> PluginPigeonError {
+  return PluginPigeonError(code: "channel-error", message: "Unable to establish connection on channel: '\(channelName)'.", details: "")
+}
+
 private func isNullish(_ value: Any?) -> Bool {
   return value is NSNull || value == nil
 }
@@ -114,6 +118,8 @@ class PluginPigeonPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendable 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol ArithmeticHostApi {
   func performArithmeticOperation(input1: Double, input2: Double, operation: ArithmeticOperation) throws -> Double
+  func startTimer() throws
+  func stopTimer() throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -138,6 +144,65 @@ class ArithmeticHostApiSetup {
       }
     } else {
       performArithmeticOperationChannel.setMessageHandler(nil)
+    }
+    let startTimerChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.plugin_workshop.ArithmeticHostApi.startTimer\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startTimerChannel.setMessageHandler { _, reply in
+        do {
+          try api.startTimer()
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      startTimerChannel.setMessageHandler(nil)
+    }
+    let stopTimerChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.plugin_workshop.ArithmeticHostApi.stopTimer\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      stopTimerChannel.setMessageHandler { _, reply in
+        do {
+          try api.stopTimer()
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      stopTimerChannel.setMessageHandler(nil)
+    }
+  }
+}
+/// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
+protocol ArithmeticFlutterApiProtocol {
+  func onReceiveTimerResult(result resultArg: Int64, completion: @escaping (Result<Void, PluginPigeonError>) -> Void)
+}
+class ArithmeticFlutterApi: ArithmeticFlutterApiProtocol {
+  private let binaryMessenger: FlutterBinaryMessenger
+  private let messageChannelSuffix: String
+  init(binaryMessenger: FlutterBinaryMessenger, messageChannelSuffix: String = "") {
+    self.binaryMessenger = binaryMessenger
+    self.messageChannelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
+  }
+  var codec: PluginPigeonPigeonCodec {
+    return PluginPigeonPigeonCodec.shared
+  }
+  func onReceiveTimerResult(result resultArg: Int64, completion: @escaping (Result<Void, PluginPigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.plugin_workshop.ArithmeticFlutterApi.onReceiveTimerResult\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([resultArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(PluginPigeonError(code: code, message: message, details: details)))
+      } else {
+        completion(.success(Void()))
+      }
     }
   }
 }

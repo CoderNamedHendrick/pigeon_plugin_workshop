@@ -15,4 +15,13 @@ enum ArithmeticOperation { add, subtract, multiply, divide }
 abstract class ArithmeticHostApi {
   double performArithmeticOperation(
       double input1, double input2, ArithmeticOperation operation);
+
+  void startTimer();
+
+  void stopTimer();
+}
+
+@FlutterApi()
+abstract class ArithmeticFlutterApi {
+  void onReceiveTimerResult(int result);
 }

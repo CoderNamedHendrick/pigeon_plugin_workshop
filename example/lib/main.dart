@@ -27,6 +27,8 @@ class _MyAppState extends State<MyApp> {
 
   bool loading = false;
 
+  bool runningTimer = false;
+
   void _toggleLoading() {
     setState(() {
       loading = !loading;
@@ -40,6 +42,37 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
+        floatingActionButton: Builder(builder: (context) {
+          return FloatingActionButton(
+            onPressed: () async {
+              try {
+                if (runningTimer) {
+                  await _pluginWorkshopPlugin.stopTimer();
+                  if (!context.mounted) return;
+                  setState(() {
+                    runningTimer = false;
+                  });
+                } else {
+                  await _pluginWorkshopPlugin.startTimer();
+                  if (!context.mounted) return;
+                  setState(() {
+                    runningTimer = true;
+                  });
+                }
+              } on PluginPigeonException catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: Colors.red,
+                    content: Text('Error: ${e.message}'),
+                  ),
+                );
+              }
+            },
+            child: runningTimer
+                ? const Icon(Icons.pause)
+                : const Icon(Icons.play_arrow),
+          );
+        }),
         body: Builder(
           builder: (context) {
             return Padding(
@@ -48,6 +81,17 @@ class _MyAppState extends State<MyApp> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    StreamBuilder(
+                      stream: _pluginWorkshopPlugin.timerResultStream,
+                      initialData: null,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          return Text('Timer result: ${snapshot.data}');
+                        }
+
+                        return const SizedBox.shrink();
+                      },
+                    ),
                     if (result != null) ...[
                       Text('Arithmetic operation result: $result'),
                       const SizedBox(height: 20),
