@@ -53,6 +53,7 @@ class PluginWorkshop implements ArithmeticFlutterApi {
   }
 
   @visibleForTesting
+  @protected
   @override
   void onReceiveTimerResult(int result) {
     _timerStreamController.sink.add(result);
